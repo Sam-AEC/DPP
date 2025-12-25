@@ -55,7 +55,7 @@ export default async function CbamPage() {
                     {decl.total_emissions ?? 0} tCO2e
                   </h3>
                   <p className="text-sm text-slate-300">
-                    Cost est.: €{decl.certificate_cost_estimate ?? 0}
+                    Cost est.: €{decl.certificate_cost_estimate ?? 0} @ €{decl.certificate_price_per_tonne ?? 0}/t
                   </p>
                 </div>
                 <span className="text-[11px] text-slate-400">
@@ -77,6 +77,16 @@ export default async function CbamPage() {
                 >
                   PDF
                 </a>
+                <form
+                  action={`/api/cbam/declarations/${decl.id}/status`}
+                  method="post"
+                  className="flex items-center gap-1"
+                >
+                  <input type="hidden" name="status" value={decl.status === "submitted" ? "draft" : "submitted"} />
+                  <button className="underline" type="submit">
+                    Mark {decl.status === "submitted" ? "Draft" : "Submitted"}
+                  </button>
+                </form>
               </div>
             </div>
           ))}

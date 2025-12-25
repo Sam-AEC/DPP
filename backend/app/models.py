@@ -197,6 +197,7 @@ class CbamDeclaration(Base):
     status = Column(String(50), nullable=False, default="draft")
     total_emissions = Column(Float, nullable=True)
     certificate_cost_estimate = Column(Float, nullable=True)
+    certificate_price_per_tonne = Column(Float, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 

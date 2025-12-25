@@ -11,6 +11,11 @@ import type {
   CbamDeclaration,
   CbamDeclarationPayload,
   AuditLog,
+  CraProduct,
+  EudrSupplier,
+  AiSystem,
+  EpdRecord,
+  Nis2Attestation,
 } from "./types";
 
 export const API_BASE_URL =
@@ -147,6 +152,17 @@ export async function createCbamFactor(body: { cn_prefix: string; emission_facto
 
 export async function listCbamFactors(): Promise<any[]> {
   return request<any[]>("/cbam/factors");
+}
+
+export async function updateCbamStatus(id: string, status: string): Promise<CbamDeclaration> {
+  return request<CbamDeclaration>(`/cbam/declarations/${id}/status`, {
+    method: "POST",
+    body: JSON.stringify({ status }),
+  });
+}
+
+export async function listArtifacts(): Promise<any[]> {
+  return request<any[]>("/artifacts");
 }
 
 export async function createCraProduct(body: Partial<CraProduct>): Promise<CraProduct> {

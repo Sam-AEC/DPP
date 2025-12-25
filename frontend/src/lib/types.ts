@@ -128,6 +128,7 @@ export type CbamDeclaration = {
   status: string;
   total_emissions?: number;
   certificate_cost_estimate?: number;
+  certificate_price_per_tonne?: number;
   items: (CbamItemPayload & { id: string; calculated_emissions?: number; created_at: string })[];
   created_at: string;
   updated_at: string;

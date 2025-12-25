@@ -12,6 +12,7 @@ from fpdf import FPDF
 
 from .. import models, schemas
 from ..auth import get_current_org
+from ..config import get_settings
 from ..database import get_db
 
 router = APIRouter(prefix="/api/cbam", tags=["cbam"])
@@ -23,7 +24,8 @@ DEFAULT_FACTORS = {
     "7601": 16.0,  # aluminum
     "2523": 0.8,  # cement
 }
-CERT_PRICE_PER_TONNE = 50.0
+settings = get_settings()
+CERT_PRICE_PER_TONNE = settings.cbam_certificate_price_per_tonne
 
 
 def calculate_emissions(item: models.CbamItem) -> float:
@@ -38,14 +40,26 @@ def render_pdf(decl: models.CbamDeclaration, items: list[models.CbamItem]) -> by
     pdf.cell(0, 10, f"CBAM Declaration {decl.period}", ln=1)
     pdf.set_font("Arial", "", 12)
     pdf.cell(0, 8, f"Status: {decl.status}", ln=1)
-    pdf.cell(0, 8, f"Total emissions: {decl.total_emissions or 0} tCO2e", ln=1)
-    pdf.cell(0, 8, f"Certificate cost estimate: {decl.certificate_cost_estimate or 0}", ln=1)
+    pdf.cell(0, 8, f"Total emissions: {decl.total_emissions or 0:.2f} tCO2e", ln=1)
+    pdf.cell(0, 8, f"Certificate price (€/t): {CERT_PRICE_PER_TONNE:.2f}", ln=1)
+    pdf.cell(
+        0,
+        8,
+        f"Certificate cost estimate: {decl.certificate_cost_estimate or 0:.2f} EUR",
+        ln=1,
+    )
     pdf.ln(4)
     pdf.set_font("Arial", "B", 12)
     pdf.cell(0, 8, "Line Items", ln=1)
     pdf.set_font("Arial", "", 11)
     for item in items:
-        pdf.cell(0, 6, f"CN {item.cn_code} | Qty {item.quantity_tonnes} t | EF {item.verified_emission_factor or item.default_emission_factor or 0} | Emissions {item.calculated_emissions or 0}", ln=1)
+        factor_used = item.verified_emission_factor or item.default_emission_factor or 0
+        supplier = item.supplier_name or "N/A"
+        pdf.multi_cell(
+            0,
+            6,
+            f"CN {item.cn_code} | Qty {item.quantity_tonnes} t | EF {factor_used} | Emissions {item.calculated_emissions or 0} | Supplier {supplier}",
+        )
     return pdf.output(dest="S").encode("latin1")
 
 
@@ -54,7 +68,8 @@ def create_declaration(payload: schemas.CbamDeclarationCreate, db: Session = Dep
     declaration = models.CbamDeclaration(
         org_id=str(org.id),
         period=payload.period,
-        status="draft",
+        status=payload.status or "draft",
+        certificate_price_per_tonne=payload.certificate_price_per_tonne or CERT_PRICE_PER_TONNE,
     )
     db.add(declaration)
     db.flush()
@@ -99,7 +114,8 @@ def create_declaration(payload: schemas.CbamDeclarationCreate, db: Session = Dep
         db.add(item)
 
     declaration.total_emissions = sum(i.calculated_emissions or 0.0 for i in items)
-    declaration.certificate_cost_estimate = (declaration.total_emissions or 0.0) * CERT_PRICE_PER_TONNE
+    price = declaration.certificate_price_per_tonne or CERT_PRICE_PER_TONNE
+    declaration.certificate_cost_estimate = (declaration.total_emissions or 0.0) * price
     db.commit()
     db.refresh(declaration)
     return schemas.CbamDeclarationRead(
@@ -133,6 +149,26 @@ def get_declaration(declaration_id: UUID, db: Session = Depends(get_db), org=Dep
     decl = db.get(models.CbamDeclaration, declaration_id)
     if not decl or (decl.org_id and decl.org_id != str(org.id)):
         raise HTTPException(status_code=404, detail="Declaration not found")
+    items = db.query(models.CbamItem).filter(models.CbamItem.declaration_id == decl.id).all()
+    return schemas.CbamDeclarationRead(
+        **decl.__dict__,
+        items=[schemas.CbamItemRead.model_validate(item) for item in items],
+    )
+
+
+@router.post("/declarations/{declaration_id}/status", response_model=schemas.CbamDeclarationRead)
+def update_declaration_status(
+    declaration_id: UUID,
+    payload: schemas.CbamStatusUpdate,
+    db: Session = Depends(get_db),
+    org=Depends(get_current_org),
+):
+    decl = db.get(models.CbamDeclaration, declaration_id)
+    if not decl or (decl.org_id and decl.org_id != str(org.id)):
+        raise HTTPException(status_code=404, detail="Declaration not found")
+    decl.status = payload.status
+    db.commit()
+    db.refresh(decl)
     items = db.query(models.CbamItem).filter(models.CbamItem.declaration_id == decl.id).all()
     return schemas.CbamDeclarationRead(
         **decl.__dict__,
@@ -196,6 +232,10 @@ def export_declaration_csv(declaration_id: UUID, db: Session = Depends(get_db), 
         "calculated_emissions",
         "supplier_name",
         "country_of_origin",
+        "supplier_name",
+        "verified_emission_factor",
+        "default_emission_factor",
+        "certificate_cost_estimate",
     ]
     lines = [",".join(headers)]
     for item in items:
@@ -208,6 +248,7 @@ def export_declaration_csv(declaration_id: UUID, db: Session = Depends(get_db), 
             str(item.calculated_emissions or ""),
             (item.supplier_name or "").replace(",", " "),
             (item.country_of_origin or "").replace(",", " "),
+            str((item.calculated_emissions or 0) * CERT_PRICE_PER_TONNE),
         ]
         lines.append(",".join(row))
     content = "\n".join(lines)

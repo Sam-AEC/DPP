@@ -40,6 +40,12 @@ def list_artifacts(db: Session = Depends(get_db), org=Depends(get_current_org)):
     )
 
 
+@router.post("/upload-url")
+def get_upload_url(filename: str, org=Depends(get_current_org)):
+    # Placeholder: return a fake URL where a file could be uploaded; replace with real storage integration.
+    return {"upload_url": f"https://storage.example.com/{org.id}/{filename}", "public_url": f"https://storage.example.com/{org.id}/{filename}"}
+
+
 @router.get("/passport/{passport_id}", response_model=List[schemas.RestrictedArtifactRead])
 def list_by_passport(passport_id: UUID, db: Session = Depends(get_db), org=Depends(get_current_org)):
     passport = db.get(models.BatteryPassport, passport_id)

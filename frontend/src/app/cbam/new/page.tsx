@@ -12,6 +12,8 @@ export default function NewCbamPage() {
   const [items, setItems] = useState<CbamItemPayload[]>([
     { cn_code: "7208", product_description: "Flat-rolled steel", quantity_tonnes: 10 },
   ]);
+  const [certificatePrice, setCertificatePrice] = useState<number | string>("");
+  const [status, setStatus] = useState("draft");
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -35,7 +37,13 @@ export default function NewCbamPage() {
     setError(null);
     setLoading(true);
     try {
-      await createCbamDeclaration({ period, items });
+      await createCbamDeclaration({
+        period,
+        status,
+        certificate_price_per_tonne:
+          typeof certificatePrice === "string" ? Number(certificatePrice) || undefined : certificatePrice,
+        items,
+      });
       router.push("/cbam");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create declaration");
@@ -60,6 +68,28 @@ export default function NewCbamPage() {
             className="rounded-lg border border-white/10 bg-slate-950/70 p-3 text-slate-50 outline-none ring-cyan-400/30 focus:ring-2"
           />
         </label>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="flex flex-col gap-2 text-sm text-slate-100">
+            Certificate price (€/t)
+            <input
+              type="number"
+              value={certificatePrice}
+              onChange={(e) => setCertificatePrice(e.target.value)}
+              className="rounded-lg border border-white/10 bg-slate-950/70 p-3 text-slate-50 outline-none ring-cyan-400/30 focus:ring-2"
+            />
+          </label>
+          <label className="flex flex-col gap-2 text-sm text-slate-100">
+            Status
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="rounded-lg border border-white/10 bg-slate-950/70 p-3 text-slate-50"
+            >
+              <option value="draft">Draft</option>
+              <option value="submitted">Submitted</option>
+            </select>
+          </label>
+        </div>
 
         <div className="space-y-4">
           {items.map((item, idx) => (

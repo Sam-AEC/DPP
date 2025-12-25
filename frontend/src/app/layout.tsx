@@ -99,6 +99,12 @@ export default function RootLayout({
                 >
                   Compliance
                 </Link>
+                <Link
+                  href="/artifacts"
+                  className="rounded-full px-4 py-2 hover:bg-white/5"
+                >
+                  Artifacts
+                </Link>
               </div>
             </nav>
             {children}

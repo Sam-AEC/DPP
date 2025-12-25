@@ -609,6 +609,12 @@ class CbamItemRead(CbamItemBase):
 class CbamDeclarationCreate(BaseModel):
     period: str
     items: List[CbamItemCreate]
+    status: Optional[str] = "draft"
+    certificate_price_per_tonne: Optional[float] = None
+
+
+class CbamStatusUpdate(BaseModel):
+    status: str
 
 
 class CbamDeclarationRead(BaseModel):
@@ -618,6 +624,7 @@ class CbamDeclarationRead(BaseModel):
     status: str
     total_emissions: Optional[float] = None
     certificate_cost_estimate: Optional[float] = None
+    certificate_price_per_tonne: Optional[float] = None
     items: List[CbamItemRead]
     created_at: datetime
     updated_at: datetime
