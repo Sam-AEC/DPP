@@ -143,3 +143,46 @@ export type AuditLog = {
   details?: Record<string, any>;
   created_at: string;
 };
+
+export type CraProduct = {
+  id: string;
+  name: string;
+  classification?: string;
+  sbom_url?: string;
+  vuln_contact?: string;
+  created_at: string;
+};
+
+export type EudrSupplier = {
+  id: string;
+  name: string;
+  country?: string;
+  geo_coordinates?: string;
+  risk_score?: number;
+  created_at: string;
+};
+
+export type AiSystem = {
+  id: string;
+  name: string;
+  risk_level?: string;
+  description?: string;
+  incident_contact?: string;
+  created_at: string;
+};
+
+export type EpdRecord = {
+  id: string;
+  product_name: string;
+  pcr_reference?: string;
+  lca_document_url?: string;
+  created_at: string;
+};
+
+export type Nis2Attestation = {
+  id: string;
+  supplier_name: string;
+  status?: string;
+  evidence_url?: string;
+  created_at: string;
+};

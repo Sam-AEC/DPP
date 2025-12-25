@@ -148,3 +148,43 @@ export async function createCbamFactor(body: { cn_prefix: string; emission_facto
 export async function listCbamFactors(): Promise<any[]> {
   return request<any[]>("/cbam/factors");
 }
+
+export async function createCraProduct(body: Partial<CraProduct>): Promise<CraProduct> {
+  return request<CraProduct>("/compliance/cra/products", { method: "POST", body: JSON.stringify(body) });
+}
+
+export async function listCraProducts(): Promise<CraProduct[]> {
+  return request<CraProduct[]>("/compliance/cra/products");
+}
+
+export async function createEudrSupplier(body: Partial<EudrSupplier>): Promise<EudrSupplier> {
+  return request<EudrSupplier>("/compliance/eudr/suppliers", { method: "POST", body: JSON.stringify(body) });
+}
+
+export async function listEudrSuppliers(): Promise<EudrSupplier[]> {
+  return request<EudrSupplier[]>("/compliance/eudr/suppliers");
+}
+
+export async function createAiSystem(body: Partial<AiSystem>): Promise<AiSystem> {
+  return request<AiSystem>("/compliance/ai/systems", { method: "POST", body: JSON.stringify(body) });
+}
+
+export async function listAiSystems(): Promise<AiSystem[]> {
+  return request<AiSystem[]>("/compliance/ai/systems");
+}
+
+export async function createEpdRecord(body: Partial<EpdRecord>): Promise<EpdRecord> {
+  return request<EpdRecord>("/compliance/epd/records", { method: "POST", body: JSON.stringify(body) });
+}
+
+export async function listEpdRecords(): Promise<EpdRecord[]> {
+  return request<EpdRecord[]>("/compliance/epd/records");
+}
+
+export async function createNis2Attestation(body: Partial<Nis2Attestation>): Promise<Nis2Attestation> {
+  return request<Nis2Attestation>("/compliance/nis2/attestations", { method: "POST", body: JSON.stringify(body) });
+}
+
+export async function listNis2Attestations(): Promise<Nis2Attestation[]> {
+  return request<Nis2Attestation[]>("/compliance/nis2/attestations");
+}

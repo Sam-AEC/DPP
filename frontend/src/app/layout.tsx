@@ -81,6 +81,24 @@ export default function RootLayout({
                 >
                   Audit
                 </Link>
+                <Link
+                  href="/jobs/imports"
+                  className="rounded-full px-4 py-2 hover:bg-white/5"
+                >
+                  Imports
+                </Link>
+                <Link
+                  href="/jobs/exports"
+                  className="rounded-full px-4 py-2 hover:bg-white/5"
+                >
+                  Exports
+                </Link>
+                <Link
+                  href="/compliance"
+                  className="rounded-full px-4 py-2 hover:bg-white/5"
+                >
+                  Compliance
+                </Link>
               </div>
             </nav>
             {children}

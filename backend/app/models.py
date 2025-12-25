@@ -192,7 +192,7 @@ class CbamDeclaration(Base):
     __tablename__ = "cbam_declarations"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    org_id = Column(String(120), nullable=True)
+    org_id = Column(String(120), nullable=True, index=True)
     period = Column(String(20), nullable=False)  # e.g., 2025-Q4
     status = Column(String(50), nullable=False, default="draft")
     total_emissions = Column(Float, nullable=True)

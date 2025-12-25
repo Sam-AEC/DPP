@@ -98,6 +98,29 @@ class BatteryPassportCreate(BatteryPassportBase):
             raise ValueError("Carbon footprint out of expected range")
         return value
 
+    @field_validator(
+        "recycled_content_cobalt",
+        "recycled_content_lead",
+        "recycled_content_lithium",
+        "recycled_content_nickel",
+    )
+    @classmethod
+    def recycled_range(cls, value: Optional[float]) -> Optional[float]:
+        if value is None:
+            return value
+        if value < 0 or value > 100:
+            raise ValueError("Recycled content must be between 0 and 100%")
+        return value
+
+    @field_validator("expected_lifetime_cycles", "expected_lifetime_years")
+    @classmethod
+    def lifetime_positive(cls, value: Optional[int]) -> Optional[int]:
+        if value is None:
+            return value
+        if value < 0:
+            raise ValueError("Lifetime must be non-negative")
+        return value
+
 
 class BatteryPassportFromTemplate(BaseModel):
     template_id: UUID
@@ -152,6 +175,47 @@ class BatteryPassportUpdate(BaseModel):
     additional_public_data: Optional[Dict[str, str]] = None
     restricted_data: Optional[Dict[str, str]] = None
     end_of_life: Optional[Dict[str, str]] = None
+
+    @field_validator("battery_weight_kg", "rated_capacity_kwh")
+    @classmethod
+    def positive_numbers(cls, value: Optional[float]) -> Optional[float]:
+        if value is None:
+            return value
+        if value < 0:
+            raise ValueError("Value must be non-negative")
+        return value
+
+    @field_validator("carbon_footprint_kg_per_kwh")
+    @classmethod
+    def cf_reasonable(cls, value: Optional[float]) -> Optional[float]:
+        if value is None:
+            return value
+        if value < 0 or value > 1000:
+            raise ValueError("Carbon footprint out of expected range")
+        return value
+
+    @field_validator(
+        "recycled_content_cobalt",
+        "recycled_content_lead",
+        "recycled_content_lithium",
+        "recycled_content_nickel",
+    )
+    @classmethod
+    def recycled_range(cls, value: Optional[float]) -> Optional[float]:
+        if value is None:
+            return value
+        if value < 0 or value > 100:
+            raise ValueError("Recycled content must be between 0 and 100%")
+        return value
+
+    @field_validator("expected_lifetime_cycles", "expected_lifetime_years")
+    @classmethod
+    def lifetime_positive(cls, value: Optional[int]) -> Optional[int]:
+        if value is None:
+            return value
+        if value < 0:
+            raise ValueError("Lifetime must be non-negative")
+        return value
 
 
 class BatteryPassportRead(BatteryPassportBase):
