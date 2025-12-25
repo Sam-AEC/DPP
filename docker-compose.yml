@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dpp
+    volumes:
+      - dpp-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    env_file:
+      - backend/.env.example
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/dpp
+      BASE_PUBLIC_URL: http://localhost:3000/scan
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    env_file:
+      - frontend/.env.example
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
+      NEXT_PUBLIC_SCAN_BASE: http://localhost:3000/scan
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  dpp-db:
+    driver: local

@@ -1,0 +1,30 @@
+# Dependencies and build output
+node_modules
+.next
+.turbo
+dist
+build
+
+# Python
+__pycache__/
+*.py[cod]
+.venv
+env/
+venv/
+
+# Environment files
+.env
+.env.local
+backend/.env
+
+# Editors
+.DS_Store
+.idea
+.vscode
+
+# Database
+dev.db
+*.sqlite
+
+# OS
+Thumbs.db
