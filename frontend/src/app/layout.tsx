@@ -51,6 +51,18 @@ export default function RootLayout({
                 >
                   New passport
                 </Link>
+                <Link
+                  href="/catalog/templates"
+                  className="rounded-full px-4 py-2 hover:bg-white/5"
+                >
+                  Catalog
+                </Link>
+                <Link
+                  href="/cbam"
+                  className="rounded-full px-4 py-2 hover:bg-white/5"
+                >
+                  CBAM
+                </Link>
               </div>
             </nav>
             {children}

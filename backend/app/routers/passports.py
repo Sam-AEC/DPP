@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from io import BytesIO
-import json
 from typing import List
 from uuid import UUID
 
@@ -12,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse, JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from fpdf import FPDF
 
 from .. import models, schemas
 from ..auth import get_current_org
@@ -271,3 +271,38 @@ def export_jsonld(passport_id: UUID, db: Session = Depends(get_db)):
         ],
     }
     return JSONResponse(content=data)
+
+
+@router.get("/{passport_id}/export/pdf")
+def export_pdf(passport_id: UUID, db: Session = Depends(get_db)):
+    record = db.get(models.BatteryPassport, passport_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="Passport not found")
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Battery Passport", ln=1)
+    pdf.set_font("Arial", "", 11)
+    pdf.cell(0, 8, f"Model: {record.battery_model}", ln=1)
+    pdf.cell(0, 8, f"Manufacturer: {record.manufacturer_name}", ln=1)
+    pdf.cell(0, 8, f"GTIN: {record.gtin}", ln=1)
+    pdf.cell(0, 8, f"Serial: {record.serial_number}", ln=1)
+    pdf.cell(0, 8, f"Category: {record.battery_category}", ln=1)
+    pdf.cell(0, 8, f"Capacity (kWh): {record.rated_capacity_kwh}", ln=1)
+    pdf.cell(0, 8, f"Weight (kg): {record.battery_weight_kg}", ln=1)
+    pdf.cell(0, 8, f"Carbon footprint: {record.carbon_footprint_kg_per_kwh} kg/kWh", ln=1)
+    pdf.ln(4)
+    pdf.cell(0, 8, f"Hazardous substances: {record.hazardous_substances or 'N/A'}", ln=1)
+    if record.additional_public_data:
+        pdf.ln(4)
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, "Additional public data", ln=1)
+        pdf.set_font("Arial", "", 11)
+        for k, v in record.additional_public_data.items():
+            pdf.cell(0, 6, f"{k}: {v}", ln=1)
+    content = pdf.output(dest="S").encode("latin1")
+    return StreamingResponse(
+        iter([content]),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename=\"passport_{passport_id}.pdf\"'},
+    )

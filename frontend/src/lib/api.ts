@@ -56,6 +56,13 @@ export async function getPublicPassport(
   return request<PublicPassport>(`/passports/${id}/public`);
 }
 
+export async function createPassportFromTemplate(body: any): Promise<BatteryPassport> {
+  return request<BatteryPassport>("/passports/from-template", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
 export async function listComponents(): Promise<Component[]> {
   return request<Component[]>("/catalog/components");
 }

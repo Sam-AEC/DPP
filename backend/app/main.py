@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
 from .database import Base, engine
-from .routers import passports, catalog, artifacts, orgs, keys, audit, jobs, cbam
+from .routers import passports, catalog, artifacts, orgs, keys, audit, jobs, cbam, dop, compliance
 
 settings = get_settings()
 
@@ -49,3 +49,5 @@ app.include_router(keys.router)
 app.include_router(audit.router)
 app.include_router(jobs.router)
 app.include_router(cbam.router)
+app.include_router(dop.router)
+app.include_router(compliance.router)

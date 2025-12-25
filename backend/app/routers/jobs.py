@@ -70,6 +70,32 @@ def run_import_job(job_id: UUID, db: Session = Depends(get_db), org=Depends(get_
                 model = models.BatteryPassport(org_id=str(org.id), **item)
                 db.add(model)
                 created += 1
+        elif record.kind == "cbam":
+            for decl in records:
+                declaration = models.CbamDeclaration(
+                    org_id=str(org.id),
+                    period=decl.get("period", "unknown"),
+                    status=decl.get("status", "draft"),
+                )
+                db.add(declaration)
+                db.flush()
+                for item in decl.get("items", []):
+                    cbam_item = models.CbamItem(
+                        declaration_id=declaration.id,
+                        org_id=str(org.id),
+                        cn_code=item.get("cn_code", ""),
+                        product_description=item.get("product_description"),
+                        quantity_tonnes=item.get("quantity_tonnes", 0),
+                        default_emission_factor=item.get("default_emission_factor"),
+                        verified_emission_factor=item.get("verified_emission_factor"),
+                        supplier_name=item.get("supplier_name"),
+                        country_of_origin=item.get("country_of_origin"),
+                    )
+                    cbam_item.calculated_emissions = (
+                        cbam_item.quantity_tonnes or 0
+                    ) * (cbam_item.verified_emission_factor or cbam_item.default_emission_factor or 0)
+                    db.add(cbam_item)
+                created += 1
         else:
             errors.append(f"Unsupported import kind: {record.kind}")
         db.commit()

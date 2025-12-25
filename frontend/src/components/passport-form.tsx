@@ -4,8 +4,8 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
-import { createPassport } from "@/lib/api";
-import type { CreatePassportPayload } from "@/lib/types";
+import { createPassport, createPassportFromTemplate } from "@/lib/api";
+import type { CreatePassportPayload, ProductTemplate } from "@/lib/types";
 
 const initialForm: CreatePassportPayload = {
   manufacturer_name: "",
@@ -123,7 +123,12 @@ const fields: Field[] = [
   },
 ];
 
-export function PassportForm() {
+type Props = {
+  templates?: ProductTemplate[];
+};
+
+export function PassportForm({ templates = [] }: Props) {
+  const [templateId, setTemplateId] = useState<string>("");
   const router = useRouter();
   const [form, setForm] = useState<CreatePassportPayload>(initialForm);
   const [publicNote, setPublicNote] = useState("");
@@ -154,11 +159,35 @@ export function PassportForm() {
     setSuccess(null);
     setLoading(true);
     try {
-      const created = await createPassport({
+      const payload = {
         ...form,
         additional_public_data: publicNote ? { note: publicNote } : undefined,
         restricted_data: restrictedNote ? { note: restrictedNote } : undefined,
-      });
+      };
+      const created = templateId
+        ? await createPassportFromTemplate({
+            template_id: templateId,
+            serial_number: form.serial_number,
+            manufacturing_date: form.manufacturing_date as unknown as string,
+            manufacturing_place: form.manufacturing_place,
+            battery_status: form.battery_status,
+            additional_public_data: payload.additional_public_data,
+            restricted_data: payload.restricted_data,
+            gtin: form.gtin,
+            battery_weight_kg: form.battery_weight_kg,
+            carbon_footprint_kg_per_kwh: form.carbon_footprint_kg_per_kwh,
+            rated_capacity_kwh: form.rated_capacity_kwh,
+            expected_lifetime_cycles: form.expected_lifetime_cycles,
+            expected_lifetime_years: form.expected_lifetime_years,
+            carbon_footprint_class: form.carbon_footprint_class,
+            hazardous_substances: form.hazardous_substances,
+            performance_class: form.performance_class,
+            recycled_content_cobalt: form.recycled_content_cobalt,
+            recycled_content_lead: form.recycled_content_lead,
+            recycled_content_lithium: form.recycled_content_lithium,
+            recycled_content_nickel: form.recycled_content_nickel,
+          })
+        : await createPassport(payload);
       setSuccess("Passport created and QR code ready.");
       router.push(`/passports/${created.id}`);
     } catch (err) {
@@ -232,6 +261,24 @@ export function PassportForm() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
+        <label className="flex flex-col gap-2 text-sm">
+          <span className="font-medium text-slate-100">Template (optional)</span>
+          <select
+            value={templateId}
+            onChange={(event) => setTemplateId(event.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-slate-950/70 p-3 text-slate-50 outline-none ring-emerald-400/30 focus:ring-2"
+          >
+            <option value="">No template</option>
+            {templates.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name} ({t.battery_model || t.battery_category})
+              </option>
+            ))}
+          </select>
+          <span className="text-xs text-slate-400">
+            Prefills Annex XIII fields if selected.
+          </span>
+        </label>
         <label className="flex flex-col gap-2 text-sm">
           <span className="font-medium text-slate-100">Additional notes</span>
           <textarea

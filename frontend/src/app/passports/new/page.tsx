@@ -1,6 +1,8 @@
 import { PassportForm } from "@/components/passport-form";
+import { listTemplates } from "@/lib/api";
 
-export default function NewPassportPage() {
+export default async function NewPassportPage() {
+  const templates = await listTemplates().catch(() => []);
   return (
     <main className="space-y-6">
       <div className="space-y-2">
@@ -15,7 +17,7 @@ export default function NewPassportPage() {
           automatically and points to the /scan public page.
         </p>
       </div>
-      <PassportForm />
+      <PassportForm templates={templates} />
     </main>
   );
 }

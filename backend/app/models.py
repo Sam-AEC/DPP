@@ -216,3 +216,73 @@ class CbamItem(Base):
     supplier_name = Column(String(255), nullable=True)
     country_of_origin = Column(String(120), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class CbamSupplier(Base):
+    __tablename__ = "cbam_suppliers"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    org_id = Column(String(120), nullable=True, index=True)
+    name = Column(String(255), nullable=False)
+    country = Column(String(120), nullable=True)
+    default_emission_factor = Column(Float, nullable=True)
+    contact = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class CraProduct(Base):
+    __tablename__ = "cra_products"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    org_id = Column(String(120), nullable=True, index=True)
+    name = Column(String(255), nullable=False)
+    classification = Column(String(80), nullable=True)
+    sbom_url = Column(String(255), nullable=True)
+    vuln_contact = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class EudrSupplier(Base):
+    __tablename__ = "eudr_suppliers"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    org_id = Column(String(120), nullable=True, index=True)
+    name = Column(String(255), nullable=False)
+    country = Column(String(120), nullable=True)
+    geo_coordinates = Column(String(255), nullable=True)
+    risk_score = Column(Float, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class AiSystem(Base):
+    __tablename__ = "ai_systems"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    org_id = Column(String(120), nullable=True, index=True)
+    name = Column(String(255), nullable=False)
+    risk_level = Column(String(80), nullable=True)
+    description = Column(String(255), nullable=True)
+    incident_contact = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class EpdRecord(Base):
+    __tablename__ = "epd_records"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    org_id = Column(String(120), nullable=True, index=True)
+    product_name = Column(String(255), nullable=False)
+    pcr_reference = Column(String(255), nullable=True)
+    lca_document_url = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class Nis2Attestation(Base):
+    __tablename__ = "nis2_attestations"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    org_id = Column(String(120), nullable=True, index=True)
+    supplier_name = Column(String(255), nullable=False)
+    status = Column(String(80), nullable=True)
+    evidence_url = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

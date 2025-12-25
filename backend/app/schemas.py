@@ -319,6 +319,112 @@ class AuditLogRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class CbamSupplierBase(BaseModel):
+    name: str
+    country: Optional[str] = None
+    default_emission_factor: Optional[float] = None
+    contact: Optional[str] = None
+
+
+class CbamSupplierCreate(CbamSupplierBase):
+    pass
+
+
+class CbamSupplierRead(CbamSupplierBase):
+    id: UUID
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CraProductBase(BaseModel):
+    name: str
+    classification: Optional[str] = None
+    sbom_url: Optional[str] = None
+    vuln_contact: Optional[str] = None
+
+
+class CraProductCreate(CraProductBase):
+    pass
+
+
+class CraProductRead(CraProductBase):
+    id: UUID
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EudrSupplierBase(BaseModel):
+    name: str
+    country: Optional[str] = None
+    geo_coordinates: Optional[str] = None
+    risk_score: Optional[float] = None
+
+
+class EudrSupplierCreate(EudrSupplierBase):
+    pass
+
+
+class EudrSupplierRead(EudrSupplierBase):
+    id: UUID
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AiSystemBase(BaseModel):
+    name: str
+    risk_level: Optional[str] = None
+    description: Optional[str] = None
+    incident_contact: Optional[str] = None
+
+
+class AiSystemCreate(AiSystemBase):
+    pass
+
+
+class AiSystemRead(AiSystemBase):
+    id: UUID
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EpdRecordBase(BaseModel):
+    product_name: str
+    pcr_reference: Optional[str] = None
+    lca_document_url: Optional[str] = None
+
+
+class EpdRecordCreate(EpdRecordBase):
+    pass
+
+
+class EpdRecordRead(EpdRecordBase):
+    id: UUID
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class Nis2AttestationBase(BaseModel):
+    supplier_name: str
+    status: Optional[str] = None
+    evidence_url: Optional[str] = None
+
+
+class Nis2AttestationCreate(Nis2AttestationBase):
+    pass
+
+
+class Nis2AttestationRead(Nis2AttestationBase):
+    id: UUID
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ImportJobCreate(BaseModel):
     kind: str
     payload: Optional[Dict[str, str]] = None

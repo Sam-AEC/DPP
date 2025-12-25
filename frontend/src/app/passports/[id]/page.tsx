@@ -113,6 +113,23 @@ export default async function PassportDetailPage({ params }: Props) {
               </p>
             </div>
           </div>
+
+          <div className="flex flex-wrap gap-3 text-xs text-cyan-100">
+            <a
+              className="underline"
+              href={`/api/passports/${passport.id}/export/jsonld`}
+              target="_blank"
+            >
+              Download JSON-LD
+            </a>
+            <a
+              className="underline"
+              href={`/api/passports/${passport.id}/export/pdf`}
+              target="_blank"
+            >
+              Download PDF
+            </a>
+          </div>
         </div>
 
         <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-slate-900/60 p-5 shadow-lg shadow-cyan-500/10">

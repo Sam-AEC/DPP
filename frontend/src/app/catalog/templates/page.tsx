@@ -74,6 +74,15 @@ export default async function TemplatesPage() {
                   <p className="font-mono">{template.carbon_footprint_class || "N/A"}</p>
                 </div>
               </div>
+              <div className="mt-3 flex flex-wrap gap-3 text-xs text-cyan-100">
+                <a
+                  className="underline"
+                  href={`/api/dop/templates/${template.id}/pdf`}
+                  target="_blank"
+                >
+                  Download DoP PDF
+                </a>
+              </div>
               <p className="mt-2 text-xs text-slate-400">
                 Use this template in the passport creator to prefill Annex XIII fields.
               </p>

@@ -16,6 +16,15 @@ from ..database import get_db
 
 router = APIRouter(prefix="/api/cbam", tags=["cbam"])
 
+DEFAULT_FACTORS = {
+    "7208": 2.1,  # flat-rolled iron/steel
+    "7207": 2.4,  # semi-finished
+    "7210": 1.9,
+    "7601": 16.0,  # aluminum
+    "2523": 0.8,  # cement
+}
+CERT_PRICE_PER_TONNE = 50.0
+
 
 def calculate_emissions(item: models.CbamItem) -> float:
     factor = item.verified_emission_factor or item.default_emission_factor or 0.0
@@ -52,13 +61,17 @@ def create_declaration(payload: schemas.CbamDeclarationCreate, db: Session = Dep
 
     items: List[models.CbamItem] = []
     for data in payload.items:
+        default_factor = data.default_emission_factor
+        if default_factor is None:
+            prefix = data.cn_code[:4]
+            default_factor = DEFAULT_FACTORS.get(prefix, 0.0)
         item = models.CbamItem(
             declaration_id=declaration.id,
             org_id=str(org.id),
             cn_code=data.cn_code,
             product_description=data.product_description,
             quantity_tonnes=data.quantity_tonnes,
-            default_emission_factor=data.default_emission_factor,
+            default_emission_factor=default_factor,
             verified_emission_factor=data.verified_emission_factor,
             supplier_name=data.supplier_name,
             country_of_origin=data.country_of_origin,
@@ -68,6 +81,7 @@ def create_declaration(payload: schemas.CbamDeclarationCreate, db: Session = Dep
         db.add(item)
 
     declaration.total_emissions = sum(i.calculated_emissions or 0.0 for i in items)
+    declaration.certificate_cost_estimate = (declaration.total_emissions or 0.0) * CERT_PRICE_PER_TONNE
     db.commit()
     db.refresh(declaration)
     return schemas.CbamDeclarationRead(
@@ -105,6 +119,28 @@ def get_declaration(declaration_id: UUID, db: Session = Depends(get_db), org=Dep
     return schemas.CbamDeclarationRead(
         **decl.__dict__,
         items=[schemas.CbamItemRead.model_validate(item) for item in items],
+    )
+
+
+@router.post("/suppliers", response_model=schemas.CbamSupplierRead, status_code=status.HTTP_201_CREATED)
+def create_supplier(payload: schemas.CbamSupplierCreate, db: Session = Depends(get_db), org=Depends(get_current_org)):
+    record = models.CbamSupplier(
+        org_id=str(org.id),
+        **payload.model_dump(),
+    )
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+@router.get("/suppliers", response_model=List[schemas.CbamSupplierRead])
+def list_suppliers(db: Session = Depends(get_db), org=Depends(get_current_org)):
+    return (
+        db.query(models.CbamSupplier)
+        .filter(models.CbamSupplier.org_id == str(org.id))
+        .order_by(models.CbamSupplier.created_at.desc())
+        .all()
     )
 
 
