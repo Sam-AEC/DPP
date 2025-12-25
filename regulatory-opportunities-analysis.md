@@ -1,95 +1,95 @@
-# Regulatory and Market Opportunities: Battery DPP + DoP Platform
+# Regulatory Opportunities and Build Plan (CBAM + DPP + CRA + EUDR + AI Act + EPD + NIS2)
 
-This document is a context pack for AI agents to build product, content, and GTM assets for a SaaS that combines Digital Product Passports (DPP) for batteries with a Declaration of Performance (DoP)-style catalog/template workflow. Focus: SME importers/assemblers who need QR-linked passports and prefer prefilled templates from a component library.
+Prepared for: Sam A. Mohammad  
+Date: December 2025
 
-## 1) Regulatory landscape (2024-2027)
-- Battery Regulation (EU 2023/1542): Battery passport mandatory from **18 Feb 2027** for LMT, industrial >2 kWh, EV batteries (Article 77, Annex XIII). QR must be ISO/IEC 18004:2015 and link to the passport.
-- ESPR (EU 2024/1781): Framework for DPP across product groups; delegated acts will define specifics for other categories (iron/steel 2027+, textiles 2028+). Batteries already covered via Battery Regulation.
-- Access tiers (Annex XIII): Public; Authorized operators; Authorities; Legitimate interest. Our MVP covers public; restricted buckets prepared for the others.
-- Data retention: Lifetime of product + **10 years after end-of-life**.
-- Identifiers: Unique ID must comply with ISO/IEC 15459. GS1 Digital Link (GTIN + serial) is the practical choice for QR payload.
-- DoP (Declaration of Performance, CPR context): Static performance declaration for construction products, no QR/access tiers. Here we borrow the *catalog + template* workflow but deliver DPP outputs.
+## 0) Platform Thesis
+Build a modular compliance suite (“ComplianceHub EU”) with shared identity, catalog/templates, reporting, QR/export, and audit rails. Lead with CBAM (urgency now), follow with Battery DPP (Feb 2027), then CRA, EUDR, AI Act, and EPD. Leverage your construction/BIM background and SME focus with self-serve pricing and white-glove onboarding.
 
-## 2) Who we serve (personas)
-- Importer/Distributor (SME): Brings batteries into EU/UK, lacks PLM. Needs quick QR-ready passports and bulk processing.
-- Assembler/Brand (SME): Builds packs from cells/modules; wants component library to avoid retyping specs and footprints.
-- Installer/Service partner: Deploys storage/industrial batteries; needs printed/engraved QR and easy public scans.
-- Compliance lead/consultant: Manages data accuracy, uploads conformity docs/test reports, oversees audits.
+## 1) Regulatory Landscape (Deadlines)
+- CBAM: January 1, 2026 (financial obligations start; transitional reporting already live).
+- CRA: Sept 11, 2026 (reporting) + Dec 11, 2027 (full compliance).
+- DPP (Battery): Feb 18, 2027 (Annex XIII public tier + access tiers).
+- ESPR delegated acts: Iron/steel (~2027), textiles (~2028+), electronics pending.
+- EUDR: Dec 30, 2026 (large) / June 30, 2027 (SMEs).
+- AI Act: Aug 2, 2026 (high-risk systems).
+- EPD (EN 15804+A2): Ongoing, rising for tenders (construction).
+- NIS2: In force; ongoing supplier-security requirements.
 
-## 3) Product concept
-- Catalog and Templates (DoP-like workflow):
-  - **Components**: Cells/modules/materials with attributes (capacity, weight, recycled content, hazardous substances, carbon footprint references, test report IDs).
-  - **Product templates**: Battery models referencing components; default public fields (category, weight, capacity, recycled content, CF class, hazards).
-  - **Passport creation**: User picks a template, then adds unit/lot specifics (serial, GTIN, manufacturing date/place, status, deviations). QR is generated and points to `/scan/{id}`.
-- Data tiers:
-  - Public: Annex XIII public fields + additional_public_data notes.
-  - Restricted: Conformity docs, test reports, dismantling/safety, end-of-life instructions.
-- Delivery:
-  - QR PNG (ISO/IEC 18004:2015) following GS1 Digital Link URL shape.
-  - Public scan page (no auth) + operator view (auth) with restricted info.
-  - API + bulk import (CSV/Excel) to create passports and load catalogs/templates.
+## 2) Personas
+- Importer/Distributor (steel, aluminum, cement, fertilizers, batteries): needs CBAM and later DPP/EPD.
+- Assembler/Brand (batteries/IoT): needs DPP/CRA.
+- Installer/Service partner (storage/industrial batteries): needs DPP public QR and restricted ops view.
+- Compliance lead/consultant: orchestrates data accuracy, documents, and audits.
 
-## 4) Core compliance checklist (batteries, Annex XIII public tier)
-- Manufacturer identification: name, address, trade name, trademark.
-- Battery model identifier.
-- Manufacturing date (month/year) and place (country/city).
-- Category: LMT / industrial >2 kWh / EV.
-- Weight (kg).
-- Status: original / repurposed / remanufactured / waste.
-- Carbon footprint declaration (kg CO2e per kWh) + performance class.
-- Recycled content (%): cobalt, lead, lithium, nickel.
-- Rated capacity (kWh).
-- Expected lifetime (cycles and/or calendar years).
-- Hazardous substances present.
-- Separate collection symbol mention.
-- Data retention: life + 10 years after end-of-life.
-- Access control: only public tier exposed on QR page; restricted tier gated.
+## 3) Modules (What to Build)
+- CBAM: CN code classifier, emissions calculator (default vs verified), supplier portal, quarterly/annual report generator, certificate cost forecaster, customs/export integration.
+- Battery DPP: Catalog + templates; template-driven passports; QR public scan; restricted operator view; restricted artifacts (conformity, test, dismantling/safety); JSON-LD/PDF exports.
+- CRA: Product classification, SBOM ingestion/generation, vulnerability intake + 24h/72h/14-day flows, technical docs, CE prep.
+- EUDR: Geolocation collection, risk scoring, Due Diligence Statement (DDS) generator, supplier portal.
+- AI Act: System classification, risk assessment, documentation package, incident reporting.
+- EPD: PCR templates, LCA data capture, EN 15804+A2 export, BIM/IFC hooks.
+- NIS2 (light): Supplier security attestation and evidence collection for SMEs.
 
-## 5) Tech blueprint (built already, extendable)
-- Frontend: Next.js (public scan, registry, detail, form) with Tailwind 4 styles. Env: `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SCAN_BASE`.
-- Backend: FastAPI + SQLAlchemy, QR via Segno, Pydantic schemas, PostgreSQL (JSONB buckets for flexible fields). Env: `DATABASE_URL`, `BASE_PUBLIC_URL`, `CORS_ORIGINS`.
-- Docker Compose: Postgres + API + UI for local runs.
-- Needed extensions for catalog/templates:
-  - Tables: `components`, `product_templates`, `template_components`, `api_keys` (for ERP), `audit_logs`.
-  - RLS/tenant scoping and auth (Clerk or Supabase Auth) to gate restricted_data and uploads.
-  - Export: JSON-LD + PDF; webhooks for downstream systems.
+## 4) Shared Architecture
+- Identity/orgs/roles; RLS by org_id.
+- Catalog (components), product templates, template_components.
+- Artifacts store (restricted docs), audit logs, API keys/webhooks.
+- Import/export engine (CSV/Excel/JSON-LD/PDF).
+- Public vs restricted delivery: QR/public pages; operator/admin views.
+- EU data residency; retention life + 10y (for DPP); backups and logging.
 
-## 6) Business model and packaging
-- Plans:
-  - Starter (EUR 99–199/mo): UI, QR, public pages, limited passports, manual import.
-  - Growth (EUR 299–499/mo): Bulk import, API access, template/catalog management, priority support.
-  - Per-passport (EUR 5–15): Low-volume option.
-  - Services add-ons: Catalog setup, GTIN/Digital Link setup, QR print/engraving coordination, ERP connector setup.
-- Channels:
-  - GS1 (GTIN guidance, Digital Link credibility).
-  - Producer Responsibility Orgs (e.g., Stichting OPEN) and industry groups (Holland Solar/SBFN) for reach.
-  - Compliance/accountant partners who handle paperwork for SMEs.
-  - Content/webinars: “Battery passport in 14 months” guide; “GS1 Digital Link + QR checklist.”
+## 5) Pricing (SME-first with volume options)
+- Starter: EUR 99–199/mo (UI, QR/public pages, limited records).
+- Growth: EUR 299–499/mo (bulk import, API, templates/catalog, priority support).
+- Per-record: EUR 5–15 per passport/declaration for low volume.
+- Services: Catalog/GTIN setup, QR print/engraving, ERP/customs integrations.
+- CBAM-specific: EUR 199–1,499/mo tiers plus per-declaration EUR 50–100.
 
-## 7) Go-to-market motions
-- Pilot bundle: “50 passports + QR labels in 2 weeks” with white-glove import of catalog/templates.
-- Proof points to capture: time-to-first-passport, error rate, QR scan reliability, audit readiness (public vs restricted).
-- Onboarding steps:
-  1) Intake catalog (components, templates), GTINs/serial rules, test report references.
-  2) Bulk import into platform; generate first batch of passports.
-  3) Print/engrave QR; validate public page shows correct Annex XIII fields.
-  4) Upload restricted docs; verify operator view and access controls.
-  5) Move to steady-state with API/bulk updates and audit logs.
+## 6) Go-to-Market
+- Channels: GS1 (Digital Link/GTIN), customs brokers (CBAM), PROs (Stichting OPEN), industry orgs (Metaalunie/FME/Holland Solar/SBFN), accountants/compliance consultants.
+- Offers: “50 CBAM declarations + setup in 2 weeks” and “50 battery passports + QR labels in 2 weeks.”
+- Content: “CBAM crash guide,” “Battery DPP in 14 months,” “GS1 Digital Link checklist.”
 
-## 8) Risks and mitigations
-- Delegated acts evolve: Keep schema flexible with JSON buckets; monitor CIRPASS/JTC 24 updates.
-- Data quality: Add validation ranges (weight, CO2e, recycled content) and audit logs.
-- Auth/compliance: Implement org/roles + RLS before onboarding; isolate restricted_data.
-- Persistence: Ensure 10+ year retention policy and backups; document data residency (EU).
-- Competition: Enterprise tools may launch SME tiers; defensibility via speed, GS1/industry partnerships, and SME-friendly pricing.
+## 7) Risks & Mitigations
+- Requirement changes: keep schemas flexible with JSONB; monitor CIRPASS/JTC24/CBAM annex updates.
+- Data quality: validation ranges, audit logs, supplier portals with defaults vs verified values.
+- Access control: RLS + org roles before onboarding real customers.
+- Persistence: 10+ year retention for DPP; backups and DR documented.
+- Competition: move fast on CBAM/DPP SME tiers; partner-driven distribution.
 
-## 9) Workback plan (next builds)
-- Week 1-2: Add catalog + templates models/API; UI prefill; CSV import for templates.
-- Week 3: Auth/roles + orgs; restrict restricted_data; audit logging.
-- Week 4: Exports (JSON-LD, PDF) + API keys/webhooks; QR label/engraving guide.
-- Week 5: Pilot onboarding playbook; launch 3–5 pilots with channel partners.
+## 8) Delivery Roadmap (Phased Build)
+### Phase 1 (CBAM-now: 4–6 weeks)
+- Implement CBAM module: CN classifier, emissions calculator (default factors), quarterly/annual report generator, supplier data intake, PDF/CSV exports.
+- API keys + webhooks; audit logs; basic org/roles/RLS.
+- Ship a pilot bundle for Dutch steel/aluminum importers with customs broker partners.
 
-## 10) How to use this context
-- For AI product agents: Generate schemas for components/templates, import mappers, and UI flows for template selection + prefill.
-- For AI content agents: Produce landing pages, pricing pages, checklists, and webinar scripts using the regulatory dates and tiered messaging above.
-- For AI eng agents: Extend current codebase to add auth, catalog/templates, bulk import, and export formats while preserving QR/public/restricted split.
+### Phase 2 (Battery DPP: 4–6 weeks, overlaps)
+- Finish template-driven passport flow (already scaffolded): templates/components CRUD, create-from-template endpoint, component snapshots.
+- Restricted artifacts endpoints (docs) + auth gating; QR bulk labels; JSON-LD/PDF exports.
+- UI: template picker, catalog manager, restricted panel, audit viewer, bulk import wizard.
+
+### Phase 3 (CRA/EUDR foundations: 6–8 weeks)
+- Add product classification + SBOM ingestion, vuln intake workflows (CRA).
+- Add geolocation capture, risk scoring, DDS export (EUDR).
+- Shared supplier portal and evidence storage.
+
+### Phase 4 (AI Act / EPD / NIS2-lite: 8–12 weeks)
+- AI system classification + documentation pack + incident logging.
+- EPD PCR templates + EN 15804 exports; BIM/IFC hooks.
+- NIS2-lite supplier security attestations.
+
+### Continuous
+- Validation, monitoring, backups, retention policies.
+- Marketing site + pricing + onboarding playbooks per module.
+
+## 9) Immediate Dev Tasks (Codebase you have)
+- Fix merge state (done by creating this clean doc).
+- Backend: keep extending org/roles/RLS, import/export engine, API keys/webhooks.
+- Frontend: template-aware forms, catalog manager, bulk import UI, restricted artifacts upload/UI, audit log viewer, export triggers.
+- Add CBAM module scaffold next (new services + endpoints + UI).
+
+## 10) Usage for AI Agents
+- Product agents: derive PRDs per module from this doc.
+- Content agents: generate site copy, pricing pages, checklists, webinars using deadlines/pricing here.
+- Eng agents: extend current FastAPI/Next.js stack with modules, auth/RLS, import/export, and public/restricted delivery.
