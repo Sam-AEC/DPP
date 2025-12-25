@@ -22,10 +22,10 @@ export default async function TemplatesPage() {
           </p>
         </div>
         <Link
-          href="/passports/new"
+          href="/catalog/templates/new"
           className="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-slate-50 hover:bg-white/20"
         >
-          Create passport
+          New template
         </Link>
       </div>
 
@@ -82,6 +82,12 @@ export default async function TemplatesPage() {
                 >
                   Download DoP PDF
                 </a>
+                <Link
+                  className="underline"
+                  href={`/passports/new?template=${template.id}`}
+                >
+                  Use in passport
+                </Link>
               </div>
               <p className="mt-2 text-xs text-slate-400">
                 Use this template in the passport creator to prefill Annex XIII fields.

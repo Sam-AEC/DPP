@@ -28,6 +28,12 @@ export default async function CbamPage() {
           New declaration
         </Link>
       </div>
+      <Link
+        href="/cbam/suppliers"
+        className="inline-flex text-xs text-cyan-100 underline"
+      >
+        Manage suppliers
+      </Link>
 
       {declarations.length === 0 ? (
         <div className="rounded-xl border border-dashed border-white/15 bg-slate-900/60 p-6 text-slate-300">

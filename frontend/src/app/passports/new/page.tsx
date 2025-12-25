@@ -1,8 +1,9 @@
 import { PassportForm } from "@/components/passport-form";
 import { listTemplates } from "@/lib/api";
 
-export default async function NewPassportPage() {
+export default async function NewPassportPage({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
   const templates = await listTemplates().catch(() => []);
+  const preselect = typeof searchParams.template === "string" ? searchParams.template : "";
   return (
     <main className="space-y-6">
       <div className="space-y-2">
@@ -17,7 +18,7 @@ export default async function NewPassportPage() {
           automatically and points to the /scan public page.
         </p>
       </div>
-      <PassportForm templates={templates} />
+      <PassportForm templates={templates} initialTemplateId={preselect} />
     </main>
   );
 }

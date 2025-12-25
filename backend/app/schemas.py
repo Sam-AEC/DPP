@@ -7,6 +7,7 @@ from typing import Dict, Optional, List
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
+from pydantic import field_validator
 
 
 class OrgCreate(BaseModel):
@@ -81,7 +82,21 @@ class BatteryPassportBase(BaseModel):
 
 
 class BatteryPassportCreate(BatteryPassportBase):
-    pass
+    model_config = ConfigDict(validate_assignment=True)
+
+    @field_validator("battery_weight_kg", "rated_capacity_kwh")
+    @classmethod
+    def positive_numbers(cls, value: float) -> float:
+        if value < 0:
+            raise ValueError("Value must be non-negative")
+        return value
+
+    @field_validator("carbon_footprint_kg_per_kwh")
+    @classmethod
+    def cf_reasonable(cls, value: float) -> float:
+        if value < 0 or value > 1000:
+            raise ValueError("Carbon footprint out of expected range")
+        return value
 
 
 class BatteryPassportFromTemplate(BaseModel):
@@ -112,6 +127,7 @@ class BatteryPassportFromTemplate(BaseModel):
 
 
 class BatteryPassportUpdate(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     manufacturer_name: Optional[str] = None
     manufacturer_address: Optional[str] = None
     battery_model: Optional[str] = None
@@ -337,6 +353,30 @@ class CbamSupplierRead(CbamSupplierBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class CbamFactorBase(BaseModel):
+    cn_prefix: str
+    emission_factor: float
+    source: Optional[str] = None
+
+    @field_validator("emission_factor")
+    @classmethod
+    def ef_bounds(cls, value: float) -> float:
+        if value < 0 or value > 500:
+            raise ValueError("Emission factor out of expected range")
+        return value
+
+
+class CbamFactorCreate(CbamFactorBase):
+    pass
+
+
+class CbamFactorRead(CbamFactorBase):
+    id: UUID
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class CraProductBase(BaseModel):
     name: str
     classification: Optional[str] = None
@@ -469,8 +509,25 @@ class CbamItemBase(BaseModel):
     quantity_tonnes: float
     default_emission_factor: Optional[float] = None
     verified_emission_factor: Optional[float] = None
+    supplier_id: Optional[UUID] = None
     supplier_name: Optional[str] = None
     country_of_origin: Optional[str] = None
+
+    @field_validator("quantity_tonnes")
+    @classmethod
+    def non_negative_qty(cls, value: float) -> float:
+        if value < 0:
+            raise ValueError("Quantity must be non-negative")
+        return value
+
+    @field_validator("default_emission_factor", "verified_emission_factor")
+    @classmethod
+    def ef_bounds(cls, value: Optional[float]) -> Optional[float]:
+        if value is None:
+            return value
+        if value < 0 or value > 500:
+            raise ValueError("Emission factor out of expected range")
+        return value
 
 
 class CbamItemCreate(CbamItemBase):

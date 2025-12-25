@@ -213,8 +213,20 @@ class CbamItem(Base):
     default_emission_factor = Column(Float, nullable=True)
     verified_emission_factor = Column(Float, nullable=True)
     calculated_emissions = Column(Float, nullable=True)
+    supplier_id = Column(UUID(as_uuid=True), ForeignKey("cbam_suppliers.id"), nullable=True)
     supplier_name = Column(String(255), nullable=True)
     country_of_origin = Column(String(120), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class CbamFactor(Base):
+    __tablename__ = "cbam_factors"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    org_id = Column(String(120), nullable=True, index=True)
+    cn_prefix = Column(String(10), nullable=False)
+    emission_factor = Column(Float, nullable=False)
+    source = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 

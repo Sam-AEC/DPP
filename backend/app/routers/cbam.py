@@ -64,7 +64,24 @@ def create_declaration(payload: schemas.CbamDeclarationCreate, db: Session = Dep
         default_factor = data.default_emission_factor
         if default_factor is None:
             prefix = data.cn_code[:4]
-            default_factor = DEFAULT_FACTORS.get(prefix, 0.0)
+            # Lookup org-specific factor first
+            factor_entry = (
+                db.query(models.CbamFactor)
+                .filter(models.CbamFactor.org_id == str(org.id))
+                .filter(models.CbamFactor.cn_prefix == prefix)
+                .first()
+            )
+            if factor_entry:
+                default_factor = factor_entry.emission_factor
+            else:
+                default_factor = DEFAULT_FACTORS.get(prefix, 0.0)
+        supplier_name = data.supplier_name
+        if data.supplier_id:
+            supplier = db.get(models.CbamSupplier, data.supplier_id)
+            if supplier and supplier.org_id == str(org.id):
+                supplier_name = supplier.name
+                if default_factor == 0 and supplier.default_emission_factor is not None:
+                    default_factor = supplier.default_emission_factor
         item = models.CbamItem(
             declaration_id=declaration.id,
             org_id=str(org.id),
@@ -73,7 +90,8 @@ def create_declaration(payload: schemas.CbamDeclarationCreate, db: Session = Dep
             quantity_tonnes=data.quantity_tonnes,
             default_emission_factor=default_factor,
             verified_emission_factor=data.verified_emission_factor,
-            supplier_name=data.supplier_name,
+            supplier_id=data.supplier_id,
+            supplier_name=supplier_name,
             country_of_origin=data.country_of_origin,
         )
         item.calculated_emissions = calculate_emissions(item)
@@ -140,6 +158,25 @@ def list_suppliers(db: Session = Depends(get_db), org=Depends(get_current_org)):
         db.query(models.CbamSupplier)
         .filter(models.CbamSupplier.org_id == str(org.id))
         .order_by(models.CbamSupplier.created_at.desc())
+        .all()
+    )
+
+
+@router.post("/factors", response_model=schemas.CbamFactorRead, status_code=status.HTTP_201_CREATED)
+def create_factor(payload: schemas.CbamFactorCreate, db: Session = Depends(get_db), org=Depends(get_current_org)):
+    record = models.CbamFactor(org_id=str(org.id), **payload.model_dump())
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+@router.get("/factors", response_model=List[schemas.CbamFactorRead])
+def list_factors(db: Session = Depends(get_db), org=Depends(get_current_org)):
+    return (
+        db.query(models.CbamFactor)
+        .filter(models.CbamFactor.org_id == str(org.id))
+        .order_by(models.CbamFactor.created_at.desc())
         .all()
     )
 

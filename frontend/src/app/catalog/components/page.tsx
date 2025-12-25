@@ -22,6 +22,14 @@ export default async function ComponentsPage() {
       {components.length === 0 ? (
         <div className="rounded-xl border border-dashed border-white/15 bg-slate-900/60 p-6 text-slate-300">
           No components yet. Import via jobs API or add through the backend.
+          <div className="mt-3 text-sm">
+            <Link
+              href="/catalog/components/new"
+              className="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-slate-50 hover:bg-white/20"
+            >
+              Add component
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">

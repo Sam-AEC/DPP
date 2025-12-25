@@ -125,10 +125,11 @@ const fields: Field[] = [
 
 type Props = {
   templates?: ProductTemplate[];
+  initialTemplateId?: string;
 };
 
-export function PassportForm({ templates = [] }: Props) {
-  const [templateId, setTemplateId] = useState<string>("");
+export function PassportForm({ templates = [], initialTemplateId = "" }: Props) {
+  const [templateId, setTemplateId] = useState<string>(initialTemplateId);
   const router = useRouter();
   const [form, setForm] = useState<CreatePassportPayload>(initialForm);
   const [publicNote, setPublicNote] = useState("");

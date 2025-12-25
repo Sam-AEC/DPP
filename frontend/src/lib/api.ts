@@ -4,10 +4,13 @@ import type {
   PublicPassport,
   Component,
   ProductTemplate,
+  ComponentCreate,
+  ProductTemplateCreate,
   ImportJob,
   ExportJob,
   CbamDeclaration,
   CbamDeclarationPayload,
+  AuditLog,
 } from "./types";
 
 export const API_BASE_URL =
@@ -71,6 +74,20 @@ export async function listTemplates(): Promise<ProductTemplate[]> {
   return request<ProductTemplate[]>("/catalog/templates");
 }
 
+export async function createComponent(body: ComponentCreate): Promise<Component> {
+  return request<Component>("/catalog/components", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function createTemplate(body: ProductTemplateCreate): Promise<ProductTemplate> {
+  return request<ProductTemplate>("/catalog/templates", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
 export async function createImportJob(kind: string, records: any[]): Promise<ImportJob> {
   return request<ImportJob>("/jobs/imports", {
     method: "POST",
@@ -110,4 +127,24 @@ export async function createCbamDeclaration(payload: CbamDeclarationPayload): Pr
 
 export async function listCbamDeclarations(): Promise<CbamDeclaration[]> {
   return request<CbamDeclaration[]>("/cbam/declarations");
+}
+
+export async function createCbamSupplier(body: { name: string; country?: string; default_emission_factor?: number; contact?: string; }): Promise<any> {
+  return request("/cbam/suppliers", { method: "POST", body: JSON.stringify(body) });
+}
+
+export async function listCbamSuppliers(): Promise<any[]> {
+  return request<any[]>("/cbam/suppliers");
+}
+
+export async function listAuditLogs(): Promise<AuditLog[]> {
+  return request<AuditLog[]>("/audit");
+}
+
+export async function createCbamFactor(body: { cn_prefix: string; emission_factor: number; source?: string }): Promise<any> {
+  return request("/cbam/factors", { method: "POST", body: JSON.stringify(body) });
+}
+
+export async function listCbamFactors(): Promise<any[]> {
+  return request<any[]>("/cbam/factors");
 }

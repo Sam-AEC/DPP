@@ -63,6 +63,24 @@ export default function RootLayout({
                 >
                   CBAM
                 </Link>
+                <Link
+                  href="/cbam/factors"
+                  className="rounded-full px-4 py-2 hover:bg-white/5"
+                >
+                  Factors
+                </Link>
+                <Link
+                  href="/cbam/suppliers"
+                  className="rounded-full px-4 py-2 hover:bg-white/5"
+                >
+                  Suppliers
+                </Link>
+                <Link
+                  href="/audit"
+                  className="rounded-full px-4 py-2 hover:bg-white/5"
+                >
+                  Audit
+                </Link>
               </div>
             </nav>
             {children}

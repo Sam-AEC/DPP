@@ -109,6 +109,7 @@ export type CbamItemPayload = {
   quantity_tonnes: number;
   default_emission_factor?: number;
   verified_emission_factor?: number;
+  supplier_id?: string;
   supplier_name?: string;
   country_of_origin?: string;
 };
@@ -118,6 +119,8 @@ export type CbamDeclarationPayload = {
   items: CbamItemPayload[];
 };
 
+export type ComponentCreate = Omit<Component, "id" | "created_at" | "updated_at">;
+export type ProductTemplateCreate = Omit<ProductTemplate, "id" | "created_at" | "updated_at">;
 export type CbamDeclaration = {
   id: string;
   org_id?: string;
@@ -128,4 +131,15 @@ export type CbamDeclaration = {
   items: (CbamItemPayload & { id: string; calculated_emissions?: number; created_at: string })[];
   created_at: string;
   updated_at: string;
+};
+
+export type AuditLog = {
+  id: string;
+  org_id?: string;
+  actor?: string;
+  action: string;
+  entity: string;
+  entity_id: string;
+  details?: Record<string, any>;
+  created_at: string;
 };
