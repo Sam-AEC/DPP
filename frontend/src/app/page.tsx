@@ -81,6 +81,10 @@ export default function Home() {
               <span>Export</span>
               <span className="font-mono text-xs text-slate-200">JSON / QR</span>
             </div>
+            <div className="flex items-center justify-between">
+              <span>Catalog</span>
+              <span className="font-mono text-xs text-slate-200">/catalog</span>
+            </div>
           </div>
         </div>
 

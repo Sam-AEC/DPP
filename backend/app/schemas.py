@@ -3,10 +3,54 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
+
+
+class OrgCreate(BaseModel):
+    name: str
+
+
+class OrgRead(BaseModel):
+    id: UUID
+    name: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserCreate(BaseModel):
+    email: str
+    role: str = "viewer"
+    org_id: Optional[UUID] = None
+
+
+class UserRead(BaseModel):
+    id: UUID
+    email: str
+    role: str
+    org_id: Optional[UUID] = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ApiKeyCreate(BaseModel):
+    name: str
+    org_id: UUID
+
+
+class ApiKeyRead(BaseModel):
+    id: UUID
+    org_id: UUID
+    name: str
+    key: str
+    created_at: datetime
+    revoked: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class BatteryPassportBase(BaseModel):
@@ -40,6 +84,33 @@ class BatteryPassportCreate(BatteryPassportBase):
     pass
 
 
+class BatteryPassportFromTemplate(BaseModel):
+    template_id: UUID
+    serial_number: str
+    manufacturing_date: date
+    manufacturing_place: str
+    battery_status: Optional[str] = "original"
+    manufacturer_name: Optional[str] = None
+    manufacturer_address: Optional[str] = None
+    battery_model: Optional[str] = None
+    gtin: Optional[str] = None
+    battery_weight_kg: Optional[float] = None
+    carbon_footprint_kg_per_kwh: Optional[float] = None
+    carbon_footprint_class: Optional[str] = None
+    recycled_content_cobalt: Optional[float] = None
+    recycled_content_lead: Optional[float] = None
+    recycled_content_lithium: Optional[float] = None
+    recycled_content_nickel: Optional[float] = None
+    rated_capacity_kwh: Optional[float] = None
+    expected_lifetime_cycles: Optional[int] = None
+    expected_lifetime_years: Optional[int] = None
+    hazardous_substances: Optional[str] = None
+    performance_class: Optional[str] = None
+    additional_public_data: Optional[Dict[str, str]] = None
+    restricted_data: Optional[Dict[str, str]] = None
+    end_of_life: Optional[Dict[str, str]] = None
+
+
 class BatteryPassportUpdate(BaseModel):
     manufacturer_name: Optional[str] = None
     manufacturer_address: Optional[str] = None
@@ -71,6 +142,7 @@ class BatteryPassportRead(BatteryPassportBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
+    template_id: Optional[UUID] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -98,5 +170,229 @@ class BatteryPassportPublic(BaseModel):
     performance_class: Optional[str] = None
     additional_public_data: Optional[Dict[str, str]] = None
     created_at: datetime
+    template_id: Optional[UUID] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ComponentBase(BaseModel):
+    name: str
+    kind: Optional[str] = None
+    description: Optional[str] = None
+    specifications: Optional[Dict[str, str]] = None
+    carbon_footprint_ref: Optional[str] = None
+    recycled_content: Optional[Dict[str, float]] = None
+    hazardous_substances: Optional[str] = None
+    test_report_refs: Optional[List[str]] = None
+
+
+class ComponentCreate(ComponentBase):
+    pass
+
+
+class ComponentUpdate(BaseModel):
+    name: Optional[str] = None
+    kind: Optional[str] = None
+    description: Optional[str] = None
+    specifications: Optional[Dict[str, str]] = None
+    carbon_footprint_ref: Optional[str] = None
+    recycled_content: Optional[Dict[str, float]] = None
+    hazardous_substances: Optional[str] = None
+    test_report_refs: Optional[List[str]] = None
+
+
+class ComponentRead(ComponentBase):
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ProductTemplateBase(BaseModel):
+    name: str
+    battery_category: str
+    battery_model: Optional[str] = None
+    manufacturer_name: Optional[str] = None
+    manufacturer_address: Optional[str] = None
+    manufacturing_place: Optional[str] = None
+    gtin: Optional[str] = None
+    battery_weight_kg: Optional[float] = None
+    carbon_footprint_kg_per_kwh: Optional[float] = None
+    carbon_footprint_class: Optional[str] = None
+    recycled_content_cobalt: Optional[float] = None
+    recycled_content_lead: Optional[float] = None
+    recycled_content_lithium: Optional[float] = None
+    recycled_content_nickel: Optional[float] = None
+    rated_capacity_kwh: Optional[float] = None
+    expected_lifetime_cycles: Optional[int] = None
+    expected_lifetime_years: Optional[int] = None
+    hazardous_substances: Optional[str] = None
+    performance_class: Optional[str] = None
+    additional_public_data: Optional[Dict[str, str]] = None
+    restricted_data: Optional[Dict[str, str]] = None
+
+
+class ProductTemplateCreate(ProductTemplateBase):
+    pass
+
+
+class ProductTemplateUpdate(BaseModel):
+    name: Optional[str] = None
+    battery_category: Optional[str] = None
+    battery_model: Optional[str] = None
+    manufacturer_name: Optional[str] = None
+    manufacturer_address: Optional[str] = None
+    manufacturing_place: Optional[str] = None
+    gtin: Optional[str] = None
+    battery_weight_kg: Optional[float] = None
+    carbon_footprint_kg_per_kwh: Optional[float] = None
+    carbon_footprint_class: Optional[str] = None
+    recycled_content_cobalt: Optional[float] = None
+    recycled_content_lead: Optional[float] = None
+    recycled_content_lithium: Optional[float] = None
+    recycled_content_nickel: Optional[float] = None
+    rated_capacity_kwh: Optional[float] = None
+    expected_lifetime_cycles: Optional[int] = None
+    expected_lifetime_years: Optional[int] = None
+    hazardous_substances: Optional[str] = None
+    performance_class: Optional[str] = None
+    additional_public_data: Optional[Dict[str, str]] = None
+    restricted_data: Optional[Dict[str, str]] = None
+    org_id: Optional[str] = None
+
+
+class ProductTemplateRead(ProductTemplateBase):
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TemplateComponentBase(BaseModel):
+    template_id: UUID
+    component_id: UUID
+    quantity: Optional[float] = None
+    notes: Optional[str] = None
+
+
+class TemplateComponentCreate(TemplateComponentBase):
+    pass
+
+
+class TemplateComponentRead(TemplateComponentBase):
+    id: UUID
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RestrictedArtifactBase(BaseModel):
+    passport_id: UUID
+    kind: str
+    title: str
+    url: Optional[str] = None
+    metadata: Optional[Dict[str, str]] = None
+
+
+class RestrictedArtifactCreate(RestrictedArtifactBase):
+    pass
+
+
+class RestrictedArtifactRead(RestrictedArtifactBase):
+    id: UUID
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AuditLogRead(BaseModel):
+    id: UUID
+    org_id: Optional[str] = None
+    actor: Optional[str] = None
+    action: str
+    entity: str
+    entity_id: str
+    details: Optional[Dict[str, str]] = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ImportJobCreate(BaseModel):
+    kind: str
+    payload: Optional[Dict[str, str]] = None
+
+
+class ImportJobRead(BaseModel):
+    id: UUID
+    org_id: Optional[str] = None
+    kind: str
+    status: str
+    payload: Optional[Dict[str, str]] = None
+    result: Optional[Dict[str, str]] = None
+    error: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ExportJobCreate(BaseModel):
+    kind: str
+    payload: Optional[Dict[str, str]] = None
+
+
+class ExportJobRead(BaseModel):
+    id: UUID
+    org_id: Optional[str] = None
+    kind: str
+    status: str
+    payload: Optional[Dict[str, str]] = None
+    result: Optional[Dict[str, str]] = None
+    error: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CbamItemBase(BaseModel):
+    cn_code: str
+    product_description: Optional[str] = None
+    quantity_tonnes: float
+    default_emission_factor: Optional[float] = None
+    verified_emission_factor: Optional[float] = None
+    supplier_name: Optional[str] = None
+    country_of_origin: Optional[str] = None
+
+
+class CbamItemCreate(CbamItemBase):
+    pass
+
+
+class CbamItemRead(CbamItemBase):
+    id: UUID
+    calculated_emissions: Optional[float] = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CbamDeclarationCreate(BaseModel):
+    period: str
+    items: List[CbamItemCreate]
+
+
+class CbamDeclarationRead(BaseModel):
+    id: UUID
+    org_id: Optional[str] = None
+    period: str
+    status: str
+    total_emissions: Optional[float] = None
+    certificate_cost_estimate: Optional[float] = None
+    items: List[CbamItemRead]
+    created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

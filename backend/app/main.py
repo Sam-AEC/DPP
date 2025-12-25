@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
 from .database import Base, engine
-from .routers import passports
+from .routers import passports, catalog, artifacts, orgs, keys, audit, jobs, cbam
 
 settings = get_settings()
 
@@ -42,3 +42,10 @@ def health() -> dict[str, str]:
 
 
 app.include_router(passports.router)
+app.include_router(catalog.router)
+app.include_router(artifacts.router)
+app.include_router(orgs.router)
+app.include_router(keys.router)
+app.include_router(audit.router)
+app.include_router(jobs.router)
+app.include_router(cbam.router)

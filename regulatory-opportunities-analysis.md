@@ -1,4 +1,4 @@
-# Regulatory Opportunities and Build Plan (CBAM + DPP + CRA + EUDR + AI Act + EPD + NIS2)
+# Regulatory Opportunities and Build Plan (CBAM + DPP + DoP + CRA + EUDR + AI Act + EPD + NIS2)
 
 Prepared for: Sam A. Mohammad  
 Date: December 2025
@@ -25,6 +25,7 @@ Build a modular compliance suite (“ComplianceHub EU”) with shared identity, 
 ## 3) Modules (What to Build)
 - CBAM: CN code classifier, emissions calculator (default vs verified), supplier portal, quarterly/annual report generator, certificate cost forecaster, customs/export integration.
 - Battery DPP: Catalog + templates; template-driven passports; QR public scan; restricted operator view; restricted artifacts (conformity, test, dismantling/safety); JSON-LD/PDF exports.
+- DoP (construction focus): Catalog/templates reused from DPP flow but output static Declaration of Performance PDFs and CE marking support; keep PCR/EN 15804 alignment for future EPD/ESPR links.
 - CRA: Product classification, SBOM ingestion/generation, vulnerability intake + 24h/72h/14-day flows, technical docs, CE prep.
 - EUDR: Geolocation collection, risk scoring, Due Diligence Statement (DDS) generator, supplier portal.
 - AI Act: System classification, risk assessment, documentation package, incident reporting.
