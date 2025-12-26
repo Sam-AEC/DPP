@@ -495,6 +495,23 @@ class AiSystemRead(AiSystemBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AiIncidentBase(BaseModel):
+    system_id: UUID
+    summary: str
+    severity: Optional[str] = None
+
+
+class AiIncidentCreate(AiIncidentBase):
+    pass
+
+
+class AiIncidentRead(AiIncidentBase):
+    id: UUID
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class EpdRecordBase(BaseModel):
     product_name: str
     pcr_reference: Optional[str] = None

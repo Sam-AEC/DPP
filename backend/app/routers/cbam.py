@@ -274,14 +274,39 @@ def export_declaration_pdf(declaration_id: UUID, db: Session = Depends(get_db), 
 
 
 @router.get("/declarations/{declaration_id}/export/eu")
-def export_declaration_eu_placeholder(declaration_id: UUID, db: Session = Depends(get_db), org=Depends(get_current_org)):
-    # Placeholder for EU-format export; implement real format later.
+def export_declaration_eu_csv(declaration_id: UUID, db: Session = Depends(get_db), org=Depends(get_current_org)):
+    # EU-format style CSV (simplified): period, status, cert price, item rows with CN, qty, EF used, emissions, cost.
     decl = db.get(models.CbamDeclaration, declaration_id)
     if not decl or (decl.org_id and decl.org_id != str(org.id)):
         raise HTTPException(status_code=404, detail="Declaration not found")
-    content = f"EU CBAM export placeholder for {decl.period} with total_emissions={decl.total_emissions or 0}"
+    items = db.query(models.CbamItem).filter(models.CbamItem.declaration_id == decl.id).all()
+    price = decl.certificate_price_per_tonne or CERT_PRICE_PER_TONNE
+    lines = [
+        "period,status,cert_price_per_tonne,total_emissions,total_cost",
+        f"{decl.period},{decl.status},{price},{decl.total_emissions or 0},{decl.certificate_cost_estimate or 0}",
+        "",
+        "cn_code,quantity_tonnes,factor_used,emissions,cost,supplier,country",
+    ]
+    for item in items:
+        factor_used = item.verified_emission_factor or item.default_emission_factor or 0
+        emissions = (item.quantity_tonnes or 0) * factor_used
+        cost = emissions * price
+        lines.append(
+            ",".join(
+                [
+                    item.cn_code or "",
+                    str(item.quantity_tonnes or ""),
+                    str(factor_used),
+                    str(emissions),
+                    str(cost),
+                    (item.supplier_name or "").replace(",", " "),
+                    (item.country_of_origin or "").replace(",", " "),
+                ]
+            )
+        )
+    content = "\n".join(lines)
     return StreamingResponse(
         iter([content]),
-        media_type="text/plain",
-        headers={"Content-Disposition": f'attachment; filename=\"cbam_{declaration_id}_eu.txt\"'},
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename=\"cbam_{declaration_id}_eu.csv\"'},
     )

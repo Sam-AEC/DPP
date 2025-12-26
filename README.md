@@ -47,6 +47,7 @@ The data model includes all mandatory public fields (manufacturer, model, manufa
 
 ## Environment
 - Backend: `DATABASE_URL`, `BASE_PUBLIC_URL` (defaults to `http://localhost:3000/scan`), `CORS_ORIGINS`
+- Security/storage toggles: `ENFORCE_ORG_POLICIES=true` to apply Postgres RLS per org, `USE_S3=true` plus `S3_BUCKET`, `S3_REGION` (and optional `S3_ENDPOINT_URL`, AWS credentials) to store artifacts in S3/MinIO instead of local `/storage`.
 - Frontend: `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SCAN_BASE`
 Samples are in `backend/.env.example` and `frontend/.env.example`.
 

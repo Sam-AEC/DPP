@@ -72,6 +72,13 @@ export default async function CbamPage() {
                 </a>
                 <a
                   className="underline"
+                  href={`/api/cbam/declarations/${decl.id}/export/eu`}
+                  target="_blank"
+                >
+                  EU CSV
+                </a>
+                <a
+                  className="underline"
                   href={`/api/cbam/declarations/${decl.id}/export/pdf`}
                   target="_blank"
                 >

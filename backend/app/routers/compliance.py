@@ -90,6 +90,28 @@ def list_ai_systems(db: Session = Depends(get_db), org=Depends(get_current_org))
     )
 
 
+@router.post("/ai/incidents", response_model=schemas.AiIncidentRead, status_code=status.HTTP_201_CREATED)
+def create_ai_incident(payload: schemas.AiIncidentCreate, db: Session = Depends(get_db), org=Depends(get_current_org)):
+    system = db.get(models.AiSystem, payload.system_id)
+    if not system or (system.org_id and system.org_id != str(org.id)):
+        raise HTTPException(status_code=404, detail="AI system not found")
+    record = models.AiIncident(org_id=str(org.id), **payload.model_dump())
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+@router.get("/ai/incidents", response_model=List[schemas.AiIncidentRead])
+def list_ai_incidents(db: Session = Depends(get_db), org=Depends(get_current_org)):
+    return (
+        db.query(models.AiIncident)
+        .filter(models.AiIncident.org_id == str(org.id))
+        .order_by(models.AiIncident.created_at.desc())
+        .all()
+    )
+
+
 # EPD
 @router.post("/epd/records", response_model=schemas.EpdRecordRead, status_code=status.HTTP_201_CREATED)
 def create_epd_record(payload: schemas.EpdRecordCreate, db: Session = Depends(get_db), org=Depends(get_current_org)):
@@ -107,6 +129,18 @@ def list_epd_records(db: Session = Depends(get_db), org=Depends(get_current_org)
         .filter(models.EpdRecord.org_id == str(org.id))
         .order_by(models.EpdRecord.created_at.desc())
         .all()
+    )
+
+
+@router.get("/epd/records/export/placeholder")
+def export_epd_placeholder(org=Depends(get_current_org)):
+    content = (
+        f"EPD export placeholder for org {org.id}. Provide EN 15804-compliant data (PCR references, LCA docs)."
+    )
+    return StreamingResponse(
+        iter([content]),
+        media_type="text/plain",
+        headers={"Content-Disposition": 'attachment; filename="epd_placeholder.txt"'},
     )
 
 

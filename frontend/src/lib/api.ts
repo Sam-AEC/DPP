@@ -16,6 +16,7 @@ import type {
   AiSystem,
   EpdRecord,
   Nis2Attestation,
+  AiIncident,
 } from "./types";
 
 export const API_BASE_URL =
@@ -217,4 +218,12 @@ export async function createNis2Attestation(body: Partial<Nis2Attestation>): Pro
 
 export async function listNis2Attestations(): Promise<Nis2Attestation[]> {
   return request<Nis2Attestation[]>("/compliance/nis2/attestations");
+}
+
+export async function createAiIncident(body: Partial<AiIncident>): Promise<AiIncident> {
+  return request<AiIncident>("/compliance/ai/incidents", { method: "POST", body: JSON.stringify(body) });
+}
+
+export async function listAiIncidents(): Promise<AiIncident[]> {
+  return request<AiIncident[]>("/compliance/ai/incidents");
 }

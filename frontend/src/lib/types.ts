@@ -172,6 +172,14 @@ export type AiSystem = {
   created_at: string;
 };
 
+export type AiIncident = {
+  id: string;
+  system_id: string;
+  summary: string;
+  severity?: string;
+  created_at: string;
+};
+
 export type EpdRecord = {
   id: string;
   product_name: string;

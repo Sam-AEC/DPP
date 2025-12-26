@@ -279,6 +279,17 @@ class AiSystem(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+class AiIncident(Base):
+    __tablename__ = "ai_incidents"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    org_id = Column(String(120), nullable=True, index=True)
+    system_id = Column(UUID(as_uuid=True), ForeignKey("ai_systems.id"), nullable=False)
+    summary = Column(String(255), nullable=False)
+    severity = Column(String(50), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 class EpdRecord(Base):
     __tablename__ = "epd_records"
 

@@ -6,6 +6,7 @@ import hashlib
 
 from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from . import models
 from .database import get_db
@@ -28,4 +29,10 @@ def get_current_org(
     org = db.get(models.Organization, record.org_id)
     if not org:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Org not found for key")
+    try:
+        if db.bind and db.bind.dialect.name == "postgresql":
+            db.execute(text("SET LOCAL dpp.org_id = :org_id"), {"org_id": str(org.id)})
+    except Exception:
+        # RLS is best-effort; avoid blocking request if SET LOCAL fails.
+        pass
     return org

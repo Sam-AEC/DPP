@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .config import get_settings
 from .database import Base, engine
+from .security import ensure_rls_policies
 from .routers import passports, catalog, artifacts, orgs, keys, audit, jobs, cbam, dop, compliance
 
 settings = get_settings()
@@ -33,14 +34,17 @@ app.add_middleware(
 )
 
 # Serve uploaded artifacts (local storage) - replace with real storage/CDN in production.
-storage_dir = Path(settings.storage_path)
-storage_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/storage", StaticFiles(directory=storage_dir), name="storage")
+if not settings.use_s3:
+    storage_dir = Path(settings.storage_path)
+    storage_dir.mkdir(parents=True, exist_ok=True)
+    app.mount("/storage", StaticFiles(directory=storage_dir), name="storage")
 
 
 @app.on_event("startup")
 def on_startup() -> None:
     init_db()
+    if settings.enforce_org_policies:
+        ensure_rls_policies(engine)
 
 
 @app.get("/health")

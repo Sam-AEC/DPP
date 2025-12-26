@@ -16,6 +16,12 @@ class Settings(BaseModel):
     cbam_certificate_price_per_tonne: float = Field(default=50.0)
     enforce_org_policies: bool = Field(default=False)
     storage_path: str = Field(default="storage")
+    use_s3: bool = Field(default=False)
+    s3_bucket: str | None = None
+    s3_region: str | None = None
+    s3_endpoint_url: str | None = None
+    aws_access_key_id: str | None = None
+    aws_secret_access_key: str | None = None
 
 
 @lru_cache
@@ -34,4 +40,10 @@ def get_settings() -> Settings:
         ),
         enforce_org_policies=os.getenv("ENFORCE_ORG_POLICIES", "false").lower() == "true",
         storage_path=os.getenv("STORAGE_PATH", Settings.model_fields["storage_path"].default),
+        use_s3=os.getenv("USE_S3", "false").lower() == "true",
+        s3_bucket=os.getenv("S3_BUCKET"),
+        s3_region=os.getenv("S3_REGION"),
+        s3_endpoint_url=os.getenv("S3_ENDPOINT_URL"),
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
     )
