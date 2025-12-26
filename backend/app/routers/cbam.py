@@ -271,3 +271,17 @@ def export_declaration_pdf(declaration_id: UUID, db: Session = Depends(get_db), 
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename=\"cbam_{declaration_id}.pdf\"'},
     )
+
+
+@router.get("/declarations/{declaration_id}/export/eu")
+def export_declaration_eu_placeholder(declaration_id: UUID, db: Session = Depends(get_db), org=Depends(get_current_org)):
+    # Placeholder for EU-format export; implement real format later.
+    decl = db.get(models.CbamDeclaration, declaration_id)
+    if not decl or (decl.org_id and decl.org_id != str(org.id)):
+        raise HTTPException(status_code=404, detail="Declaration not found")
+    content = f"EU CBAM export placeholder for {decl.period} with total_emissions={decl.total_emissions or 0}"
+    return StreamingResponse(
+        iter([content]),
+        media_type="text/plain",
+        headers={"Content-Disposition": f'attachment; filename=\"cbam_{declaration_id}_eu.txt\"'},
+    )

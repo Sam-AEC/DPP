@@ -54,7 +54,7 @@ def update_component(
         raise HTTPException(status_code=404, detail="Component not found")
     if record.org_id and record.org_id != str(org.id):
         raise HTTPException(status_code=404, detail="Component not found")
-    for key, value in payload.model_dump(exclude_none=True).items():
+    for key, value in payload.model_dump(exclude_none=True, exclude={"org_id"}).items():
         setattr(record, key, value)
     db.commit()
     db.refresh(record)

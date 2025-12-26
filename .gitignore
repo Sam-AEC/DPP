@@ -25,6 +25,7 @@ backend/.env
 # Database
 dev.db
 *.sqlite
+storage/
 
 # OS
 Thumbs.db

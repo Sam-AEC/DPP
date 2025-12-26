@@ -68,6 +68,12 @@ export default async function ComponentsPage() {
                 {component.test_report_refs?.length ? (
                   <p>Tests: {component.test_report_refs.join(", ")}</p>
                 ) : null}
+                <Link
+                  href={`/catalog/components/${component.id}`}
+                  className="text-xs text-cyan-100 underline"
+                >
+                  Edit
+                </Link>
               </div>
             </div>
           ))}

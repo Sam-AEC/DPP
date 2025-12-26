@@ -145,6 +145,12 @@ export default function CompliancePage() {
           </div>
         </section>
       </div>
+      <a
+        href="/api/compliance/export/placeholder"
+        className="inline-flex text-xs text-cyan-100 underline"
+      >
+        Download placeholder compliance export
+      </a>
     </main>
   );
 }

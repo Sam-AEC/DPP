@@ -165,6 +165,20 @@ export async function listArtifacts(): Promise<any[]> {
   return request<any[]>("/artifacts");
 }
 
+export async function updateComponent(id: string, body: Partial<Component>): Promise<Component> {
+  return request<Component>(`/catalog/components/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function updateTemplate(id: string, body: Partial<ProductTemplate>): Promise<ProductTemplate> {
+  return request<ProductTemplate>(`/catalog/templates/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
 export async function createCraProduct(body: Partial<CraProduct>): Promise<CraProduct> {
   return request<CraProduct>("/compliance/cra/products", { method: "POST", body: JSON.stringify(body) });
 }

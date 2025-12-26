@@ -88,6 +88,12 @@ export default async function TemplatesPage() {
                 >
                   Use in passport
                 </Link>
+                <Link
+                  className="underline"
+                  href={`/catalog/templates/${template.id}`}
+                >
+                  Edit
+                </Link>
               </div>
               <p className="mt-2 text-xs text-slate-400">
                 Use this template in the passport creator to prefill Annex XIII fields.

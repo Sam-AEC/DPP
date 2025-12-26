@@ -6,6 +6,7 @@ from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
@@ -126,4 +127,18 @@ def list_attestations(db: Session = Depends(get_db), org=Depends(get_current_org
         .filter(models.Nis2Attestation.org_id == str(org.id))
         .order_by(models.Nis2Attestation.created_at.desc())
         .all()
+    )
+
+
+@router.get("/export/placeholder")
+def export_compliance_placeholder(org=Depends(get_current_org)):
+    # Placeholder combined export for CRA/EUDR/AI/EPD/NIS2 data.
+    content = (
+        f"Compliance export placeholder for org {org.id}. "
+        "Integrate real exports per regulation (CRA SBOM/vuln, EUDR DDS, AI incidents, EPD EN15804, NIS2 evidence)."
+    )
+    return StreamingResponse(
+        iter([content]),
+        media_type="text/plain",
+        headers={"Content-Disposition": 'attachment; filename="compliance_placeholder.txt"'},
     )

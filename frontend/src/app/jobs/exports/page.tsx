@@ -81,6 +81,24 @@ export default function ExportJobsPage() {
             {job.error ? (
               <p className="text-xs text-red-200">Error: {job.error}</p>
             ) : null}
+            {job.result?.csv ? (
+              <a
+                href={`data:text/csv;charset=utf-8,${encodeURIComponent(job.result.csv)}`}
+                download={`${job.kind}.csv`}
+                className="mt-2 inline-flex text-xs text-cyan-100 underline"
+              >
+                Download CSV
+              </a>
+            ) : null}
+            {job.result?.json ? (
+              <a
+                href={`data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(job.result.json))}`}
+                download={`${job.kind}.json`}
+                className="mt-2 inline-flex text-xs text-cyan-100 underline"
+              >
+                Download JSON
+              </a>
+            ) : null}
           </div>
         ))}
       </div>

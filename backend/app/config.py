@@ -14,6 +14,8 @@ class Settings(BaseModel):
     base_public_url: str = Field(default="http://localhost:3000/scan")
     cors_origins: List[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     cbam_certificate_price_per_tonne: float = Field(default=50.0)
+    enforce_org_policies: bool = Field(default=False)
+    storage_path: str = Field(default="storage")
 
 
 @lru_cache
@@ -30,4 +32,6 @@ def get_settings() -> Settings:
                 Settings.model_fields["cbam_certificate_price_per_tonne"].default,
             )
         ),
+        enforce_org_policies=os.getenv("ENFORCE_ORG_POLICIES", "false").lower() == "true",
+        storage_path=os.getenv("STORAGE_PATH", Settings.model_fields["storage_path"].default),
     )

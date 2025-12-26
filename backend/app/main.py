@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 from .config import get_settings
 from .database import Base, engine
@@ -30,6 +32,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Serve uploaded artifacts (local storage) - replace with real storage/CDN in production.
+storage_dir = Path(settings.storage_path)
+storage_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/storage", StaticFiles(directory=storage_dir), name="storage")
+
 
 @app.on_event("startup")
 def on_startup() -> None:
@@ -39,6 +46,12 @@ def on_startup() -> None:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/metrics")
+def metrics() -> dict[str, str]:
+    # Placeholder metrics endpoint; integrate real monitoring later.
+    return {"metrics": "pending"}
 
 
 app.include_router(passports.router)
